@@ -18,7 +18,7 @@ elif conf.platform == conf.iosname:
 #导入base.conftest里的pytest上下文环境函数:driverenv、action(ElementActions的实例)、caselog
 #pytest框架运行原理：先运行test文件夹下面的conftest.py，然后才运行带test开头的py文件
 
-@pytest.fixture('package',autouse=True)
+@pytest.fixture(scope='module',autouse=True)
 def suitinit(action):
     # p.特卖首页.home(action)
     p.特卖首页.pageinto(action)

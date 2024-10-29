@@ -7,7 +7,6 @@ from base.utils import log
 #元素定位方式尽量不要xpath，容易很慢(Appium对于xpath定位执行效率是比较低的)
 #已通过find_elements_by_android_uiautomator实现通过name元素定位
 
-
 class HomePage(BasePage):
 
     name="特卖首页"
@@ -18,19 +17,14 @@ class HomePage(BasePage):
         try:
             action.click(self.关闭初始化弹出窗,wait=3)
         except:
-            log.info('无弹窗需要关闭,所以不会找到元素 关闭初始化弹出窗')
+            log.info('无弹窗,未找到元素 关闭初始化弹出窗')
         action.tap(self.关闭初始化浮窗)
-
-
 
     def pageinto(self,action:ElementActions):
         action.start_activity(self.activity)
 
-
-
-
     def load_android(self):
-        self.activity="com.jm.android.jumei.home.activity.NewHomeActivity"
+        self.activity="/.home.activity.NewHomeActivity"
 
         self.关闭初始化浮窗=self.get_locator('关闭初始化浮窗','tap','891,132')
         self.关闭初始化弹出窗=self.get_locator("关闭初始化弹出窗",'id','com.jm.android.jumei:id/image_home_full_close')
@@ -47,10 +41,8 @@ class HomePage(BasePage):
         #元素通过坐标位置点击
         self.进入用户中心按钮=self.get_locator('进入用户中心按钮','tap','987,1483')
 
-
         self.发布=self.get_locator('发布','id','com.jm.android.jumei:id/iv_publish_video')
         self.发布_上传视频=self.get_locator('上传视频','name','上传视频')
-
 
     def load_ios(self):
         self.搜索输入框="4455"

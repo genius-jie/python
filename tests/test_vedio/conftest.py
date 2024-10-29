@@ -14,7 +14,7 @@ elif conf.platform==conf.iosname:
     from base.conftest_ios import *
 
 
-@pytest.fixture('package',autouse=True)
+@pytest.fixture(scope='module',autouse=True)
 def suitinit(action):
     # p.特卖首页.home(action)
     # base_business.set_appenv(action)

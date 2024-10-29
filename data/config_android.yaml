@@ -1,31 +1,30 @@
 appium:
- app: /Users/tmh/PycharmProjects/appauto/data/apk/jumei.apk
+ app: C:\Users\ali\Documents\py_appauto\data\apk\jumei.apk
  appActivity:  com.jm.android.jumei.home.activity.StartActivity
  appPackage: com.jm.android.jumei
- version: '1.9.1'
+ version: '2.11.5'
 # host: http://172.20.11.15:4723/wd/hub
- host: http://localhost:4723/wd/hub
+ host: http://127.0.0.1:4723
 
 
 devices:
  device1:
-  deviceName: 2425a80b
+  deviceName: A04140000A1001
   platformName: Android
-  platformVersion: '8.1.0'
-  appiumserver: http://localhost:4723/wd/hub
+  platformVersion: '13'
+  appiumserver: http://127.0.0.1:4723/wd/hub
   systemPort: 8201
 
-# device2:
-#  deviceName: 192.168.56.101:5555
+# device1:
+#  deviceName: 9109ad84
 #  platformName: Android
-#  platformVersion: '6.0'
-#  appiumserver: http://172.20.11.11:4723/wd/hub
+#  platformVersion: '13'
+#  appiumserver: http://127.0.0.1:4723/wd/hub
 #  systemPort: 8201
-#  Resolution: [1080,1920]
 
 path:
-  tests: /Users/tmh/PycharmProjects/appauto/tests
-  report: /Users/tmh/PycharmProjects/appauto/report
+ tests: C:\Users\ali\Documents\py_appauto\tests
+ report: C:\Users\ali\Documents\py_appauto\report
 
 
 

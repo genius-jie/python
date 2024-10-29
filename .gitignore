@@ -117,3 +117,4 @@ dmypy.json
 /apk
 .idea
 .DS_Store
+/report/

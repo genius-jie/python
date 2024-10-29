@@ -29,7 +29,7 @@ class Conf():
     def get_info(self):
 
         with open(self.config_path, "r") as f:
-            info = yaml.load(f)
+            info = yaml.safe_load(f)
         return info
 
     def set_info(self):
@@ -56,7 +56,7 @@ class ArgsData():
     def get_info(self):
 
         with open(self.config_path, "r") as f:
-            info = yaml.load(f)
+            info = yaml.safe_load(f)
         return info
 
     def set_info(self):
@@ -139,7 +139,7 @@ def ls_by_key(path:str,key:str):
     from base.shell import Shell
 
     result=[]
-    out=Shell.invoke('ls',cwd=path,is_log=False)
+    out=Shell.invoke('dir /b',cwd=path,is_log=False)
 
     for ele in out.splitlines():
         if key in ele:

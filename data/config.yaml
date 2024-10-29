@@ -1,1 +1,2 @@
-platform: {run: android}
+platform:
+  run: android

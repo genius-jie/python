@@ -8,7 +8,7 @@ import abc,inspect
 
 class BasePage(metaclass=abc.ABCMeta):
     #抽象类BasePage，不能被实例化，实际使用的子类
-    #初始化时，通过平台决定加载的元素（实际使用page的元素时，使用对应平台的元素）
+    #初始化时，通过平台决定加载的元素（实际使用page的元素时，使用对应平  台的元素）
 
     def __init__(self):
         conf = Conf()
@@ -33,7 +33,7 @@ class BasePage(metaclass=abc.ABCMeta):
 
     #获取定位器对象(字典结构)，定位器对象返回的就是元素本身，包含对应元素属性
     #元素属性有：元素名、元素的定位方式、对应定位方式的值、是否是动态元素、出现该元素的前置操作（默认为空，填写page类的前置操作方法名）、元素的页面名
-    def  get_locator(self,elename, type, value, dynamic=False,switch=None,page=None):
+    def get_locator(self,elename, type, value, dynamic=False,switch=None,page=None):
 
         if page==None:
             page=self.name
@@ -48,7 +48,6 @@ class BasePage(metaclass=abc.ABCMeta):
 
         return locator
 
-
     def pageinto(self,action):
         pass
 
@@ -58,13 +57,8 @@ def check_pageset(Pagesset,action: ElementActions):
     #参数Pagesset为元素是Pages的list
 
     for Pages in Pagesset:
-
         log.info('\n ++++++检测静态页面集： {}++++++\n'.format(Pages.__name__))
-
         check_page(Pages,action)
-
-
-
 
 def check_page(Pages,action: ElementActions):
 

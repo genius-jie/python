@@ -3,7 +3,6 @@ from base.shell import *
 from base.utils import log,singleton
 
 
-
 #环境的抽象类
 class Environment(metaclass=abc.ABCMeta):
 
@@ -39,7 +38,7 @@ class EnvironmentAndroid(Environment):
 
         log.info('获取环境配置 Path:' + environment_info_path)
         with open(environment_info_path,"r") as f:
-            conf=yaml.load(f)
+            conf=yaml.safe_load(f)
 
         return conf
 
@@ -73,12 +72,14 @@ class EnvironmentAndroid(Environment):
         if len(current_devices)==0:
             log.info('没有设备连接')
             exit()
-        for device in self.devices:
-            deviceName=device.get("deviceName")
+        log.info( self.devices)
+        # 遍历 devices_json 并检查每个设备是否已连接
+        for device_key, device_info in self.devices.items():
+            deviceName = device_info.get("deviceName")
             if deviceName in current_devices:
-                log.info('已正常连接设备{}'.format(deviceName))
+                log.info(f'已正常连接设备 {deviceName}')
             else:
-                log.error('设备{}未正常连接'.format(deviceName))
+                log.error(f'设备 {deviceName} 未正常连接')
 
 
 

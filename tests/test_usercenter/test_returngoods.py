@@ -76,7 +76,7 @@ class Test_favourite():
 
         up.用户中心.pageinto(action)
         action.click(up.用户中心.收藏商品)
-
+        # zlj:这里可能会有问题，可能需要去掉value这个传参，预期是传入了两个map{}
         product_locator=up.收藏页.newlocator(up.收藏页.当前收藏商品, 'value', productname)
         action.get_img('收藏商品列表')
         Validator.assert_true(action.is_element_exist(product_locator),'断言失败： 没找到对应收藏的商品')
@@ -92,7 +92,6 @@ class Test_favourite():
 class Test_debug():
 
     def test_case1(self,action):
-
 
         up.用户中心.pageinto(action)
         action.click(up.用户中心.查看全部订单)

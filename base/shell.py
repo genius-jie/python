@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os,sys,pytest
 from base.utils import log
-from base.environment import EnvironmentAndroid
 
 import subprocess
 
