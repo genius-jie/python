@@ -1,0 +1,8 @@
+selenium
+Appium-Python-Client
+PyYAML
+pytest
+allure-pytest
+flaky
+pytest-sugar
+jprops
