@@ -6,7 +6,7 @@ import logging,os,yaml,copy,time
 
 
 
-#单例装饰器
+#zlj:单例装饰器，在类头上添加上这个注解后，该类初始化就会按照单例设计模式的方法完成
 def singleton(class_):
     instances = {}
 
@@ -27,7 +27,6 @@ class Conf():
         self.platform=self.info.get('platform')['run']
 
     def get_info(self):
-
         with open(self.config_path, "r") as f:
             info = yaml.safe_load(f)
         return info

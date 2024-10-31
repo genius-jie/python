@@ -139,5 +139,29 @@ run class case:
 run class::method case:  
     ```python3 run.py  test/test_demo.py::Test_demo::test_home```  
 
-### 待完善
-ios兼容
+### 目录结构说明
+page.py抽象类，定义页面对象的通用方法
+
+    load_android定位元素的xpath,css等信息
+    get_locator返回定位locator字典
+    newlocator基于定位修改属性，返回其他元素的定位信息
+    pageinto进入页面方法
+
+action封装元素操作
+
+utils获取配置信息，打印log对象，等待时间计算对象
+
+conftest_android.py控制执行，pytest的setup和down工作
+
+environment.py环境检查
+
+run.py执行和任务调度
+
+verify.py断言
+
+tests/test_demo.py测试用例
+
+    __init__.py定义包结构
+    conftest.py控制执行，包的前置后置操作
+    test_demo2.py test开头测试用例
+

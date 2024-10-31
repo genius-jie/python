@@ -75,7 +75,7 @@ class Run():
 
     def exec(self,sys_argv):
 
-
+        # 如果传递了参数，就在device1单台设备上执行。
         if len(sys_argv) != 0:
             self._exec_pytest(sys_argv)
 
@@ -194,9 +194,8 @@ class Run():
                     tmp=[]
             count+=1
 
-        #对最后一个加入整除后剩余的
-        last_ele=suitname_list_slice[-1]
-        suitname_list_slice[-1]=last_ele+tmp
+        # 直接在列表的最后一个元素上进行操作，添加剩余的tmp用例
+        suitname_list_slice[-1] += tmp
 
 
         scheduling_info={}

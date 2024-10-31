@@ -19,7 +19,7 @@ elif conf.platform == conf.iosname:
 #pytest框架运行原理：先运行test文件夹下面的conftest.py，然后才运行带test开头的py文件
 
 @pytest.fixture(scope='package',autouse=True)
-def suitinit(action):
+def suit_init(action):
     # p.特卖首页.home(action)
     p.特卖首页.pageinto(action)
     # base_business.set_appenv(action)

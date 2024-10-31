@@ -52,7 +52,7 @@ class ElementActions:
         message = 'start_activity:    ' + app_activity
         log.info(message)
         params = {
-            # com.jm.android.jumei/.home.activity.NewHomeActivity
+            # zlj:com.jm.android.jumei/.home.activity.NewHomeActivity
             'intent': self.env.appium.get("appPackage")+app_activity,
             **opts
         }
@@ -203,7 +203,7 @@ class ElementActions:
             return self._find_ele_child_byname(locator_parent, locator_child, is_Multiple, wait)
 
     def find_ele_child_byelement(self, element_parent, locator_child, is_Multiple=False, wait=6):
-        # 通过父结点元素查找子结点元素,不支持name定位方式
+        # 通过父结点元素查找子结点元素,不支持name定位方式，支持查找到很多个子节点
 
         if locator_child['type'] == 'name':
             log.error('find_ele_child_byelement的定位方式错误')
@@ -236,6 +236,7 @@ class ElementActions:
 
     def find_ele_parent(self, locator_parent, locator_child, wait=2):
         # 通过子节点来定位父节点元素,locator_parent有多个元素（通过遍历父节点，找出包含符合条件子节点的父节点）
+        # 注意，子节点必须唯一，不然找到的父节点可能只是第一个匹配上的
         # 定位方式限制 子节点 定位方式不能是name
 
         if locator_child['type'] == 'name':
@@ -292,7 +293,6 @@ class ElementActions:
                 return self.driver.find_element_by_android_uiautomator(ui_value)
             else:
                 return self.driver.find_elements_by_android_uiautomator(ui_value)
-
         except:
             log.info('页面【{}】未找到 元素【{}】\n locator: {}'.format(locator_tmp.get("page"), locator_target.get('name'),
                                                              str(locator_target)))
