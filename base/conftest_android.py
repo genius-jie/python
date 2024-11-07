@@ -24,13 +24,13 @@ def driverenv():
         'deviceName': current_device.get("deviceName"),
         'udid': current_device.get("deviceName"),
         'systemPort': current_device.get('systemPort'),
-        'app': env.appium.get("app"),
+        # 'app': env.appium.get("app"),
         'clearSystemFiles': True,
-        'appActivity': env.appium.get("appActivity"),
-        'appPackage': env.appium.get("appPackage"),
+        # 'appActivity': env.appium.get("appActivity"),
+        # 'appPackage': env.appium.get("appPackage"),
         'automationName': 'UIAutomator2',
         'noSign': True,
-        'recreateChromeDriverSessions': True,
+        # 'recreateChromeDriverSessions': True,
         "unicodeKeyboard": True,
         "noReset": True,
         "fullReset": False,
@@ -61,7 +61,8 @@ def driverenv():
 
     driver = webdriver.Remote(f'http://127.0.0.1:4723', options=options)
     # driver = webdriver.Remote(host,  options=options)
-
+    driver.update_settings({"fixImageTemplatescale": True})
+    driver.implicitly_wait(10)
     return driver
 
 

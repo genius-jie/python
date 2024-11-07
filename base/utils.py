@@ -9,7 +9,7 @@ import logging,os,yaml,copy,time
 #zlj:单例装饰器，在类头上添加上这个注解后，该类初始化就会按照单例设计模式的方法完成
 def singleton(class_):
     instances = {}
-
+    print(f"Instances dictionary address: {class_}  {id(instances)}")
     def getinstance(*args, **kwargs):
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)

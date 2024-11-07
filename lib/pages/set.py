@@ -2,6 +2,7 @@ from .productpage import *
 from .userpage import *
 from .buypage import *
 from .vedio import *
+from .mainpage import *
 from base.utils import Conf
 
 
@@ -30,6 +31,9 @@ class BuyPages:
 
 class VedioPages:
     视频发布页=VideoReleasePage()
+
+class MainPages:
+    桌面=mainPage()
 
 
 

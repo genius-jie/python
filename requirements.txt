@@ -6,3 +6,5 @@ allure-pytest
 flaky
 pytest-sugar
 jprops
+allure-python-commons
+uiautomator2

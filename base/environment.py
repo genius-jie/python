@@ -33,8 +33,7 @@ class EnvironmentAndroid(Environment):
 
     def get_conf(self):
 
-        environment_info_path = str(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, "data/config_android.yaml")))
+        environment_info_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../data/config_android.yaml"))
 
         log.info('获取环境配置 Path:' + environment_info_path)
         with open(environment_info_path,"r") as f:

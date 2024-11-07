@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from appium import webdriver
+from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.common.actions import interaction
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
@@ -287,12 +288,12 @@ class ElementActions:
 
         try:
             WebDriverWait(self.driver, wait).until(
-                lambda driver: driver.find_element_by_android_uiautomator(ui_value))
+                lambda driver: driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value))
 
             if is_Multiple == False:
-                return self.driver.find_element_by_android_uiautomator(ui_value)
+                return self.driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
             else:
-                return self.driver.find_elements_by_android_uiautomator(ui_value)
+                return self.driver.find_elements(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
         except:
             log.info('页面【{}】未找到 元素【{}】\n locator: {}'.format(locator_tmp.get("page"), locator_target.get('name'),
                                                              str(locator_target)))
@@ -509,15 +510,15 @@ class ElementActions:
                 type_parent, value_parent, value_child)
 
             WebDriverWait(self.driver, wait).until(
-                lambda driver: driver.find_element_by_android_uiautomator(ui_value))
+                lambda driver: driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value))
 
             log.info("页面【{}】的元素【{}】成功查找子节点 元素【{}】".format(locator_parent.get("page"), locator_parent.get("name"),
                                                           locator_child.get('name')))
 
             if is_Multiple == False:
-                return self.driver.find_element_by_android_uiautomator(ui_value)
+                return self.driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
             else:
-                return self.driver.find_elements_by_android_uiautomator(ui_value)
+                return self.driver.find_elements(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
 
 
         except:
@@ -624,8 +625,7 @@ class ElementActions:
         # find_element在安卓中appium定位不支持通过name查找,但uiautomator可以且速度快
         if ltype == 'name':
             ui_value = 'new UiSelector().textContains(\"{}\")'.format(value)
-            return driver.find_element_by_android_uiautomator(
-                ui_value) if element else driver.find_elements_by_android_uiautomator(ui_value)
+            return driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value) if element else driver.find_elements("-android uiautomator",ui_value)
         else:
             return driver.find_element(ltype, value) if element else driver.find_elements(ltype, value)
 
