@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os,sys,pytest
-from base.utils import log
+from base.utils import log, singleton
 
 import subprocess
 
@@ -33,6 +33,12 @@ class Shell:
         output, errors=p.communicate()
         o = output.decode("utf-8")
         return o
+    @staticmethod
+    def run_jmeter(test_plan_path,type,num,userId):
+        # 构建命令
+        command = f'jmeter -n -t {test_plan_path} -l results.jtl -j -Jtype={type} -Jnum={num} -JuserId={userId}'
+        Shell.invoke(command)
+
 
 # 判断是否设置环境变量ANDROID_HOME
 if "ANDROID_HOME" in os.environ:

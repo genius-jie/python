@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
+import base64
+import os
 
+import imagehash
+import requests
 from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
+from pytesseract import pytesseract
 from selenium.webdriver.common.actions import interaction
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
@@ -13,7 +18,8 @@ from base.utils import log, singleton, Waittime_count
 import allure, time
 from base.verify import NotFoundElementError, NotFoundTextError
 from base.environment import EnvironmentAndroid
-
+from PIL import Image
+from pathlib import Path
 
 # 封装元素操作的类
 
@@ -27,7 +33,7 @@ class ElementActions:
         self.Resolution = self.env.current_device.get('Resolution')
 
         if self.Resolution == None:
-            self.Resolution = [1080, 1920]
+            self.Resolution = [1080, 1920]  # 2880 1800
 
         self.width = self.Resolution[0]
         self.height = self.Resolution[1]
@@ -48,13 +54,24 @@ class ElementActions:
         current_name = name + current_time + '.png'
         allure.attach(png_data, name=current_name, attachment_type=allure.attachment_type.PNG)
 
+    def save_image(self, name="app截图"):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        screenshot_dir = os.path.join(current_dir, "../data/screenShot")
+        screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
+        try:
+            png_data = self.driver.get_screenshot_as_png()
+            with open(screenshot_path, 'wb') as f:
+                f.write(png_data)
+            return screenshot_path
+        except Exception as e:
+            print(f"Error taking screenshot: {e}")
+        return None
 
     def start_activity(self, app_activity, **opts):
         message = 'start_activity:    ' + app_activity
-        log.info(message)
         params = {
             # zlj:com.jm.android.jumei/.home.activity.NewHomeActivity
-            'intent': self.env.appium.get("appPackage")+app_activity,
+            'intent': self.env.appium.get("appPackage") + app_activity,
             **opts
         }
         # log.info(f"Params: {params}")
@@ -97,7 +114,8 @@ class ElementActions:
             x = int(position[0]) * self.width / 1080
             y = int(position[1]) * self.height / 1920
             positions = [(x, y)]
-            log.info("通过坐标({},{}), 成功点击 页面【{}】的元素【{}】".format(x, y, locator.get('page'), locator.get('name')))
+            log.info(
+                "通过坐标({},{}), 成功点击 页面【{}】的元素【{}】".format(x, y, locator.get('page'), locator.get('name')))
 
             self.driver.tap(positions, duration=400)
 
@@ -217,8 +235,8 @@ class ElementActions:
 
             log.info(
                 "页面【{}】的元素【{}】成功查询到查找子节点 元素【{}】"
-                    .format(locator_child.get("page"), element_parent,
-                            locator_child.get('name')))
+                .format(locator_child.get("page"), element_parent,
+                        locator_child.get('name')))
 
             if is_Multiple == False:
                 return element_parent.find_element(type_child, value_child)
@@ -227,8 +245,8 @@ class ElementActions:
         except:
             log.info(
                 "页面【{}】的元素【{}】未能查询到查找子节点 元素【{}】\n locator_child{}"
-                    .format(locator_child.get("page"), element_parent,
-                            locator_child.get('name'), locator_child))
+                .format(locator_child.get("page"), element_parent,
+                        locator_child.get('name'), locator_child))
 
             if is_Multiple == False:
                 return None
@@ -264,7 +282,7 @@ class ElementActions:
         """
 
         log.info("页面【{}】通过元素【{}】查找兄弟元素【{}】".format(locator_tmp.get("page"), locator_tmp.get('name'),
-                                                   locator_target.get("name")))
+                                                               locator_target.get("name")))
 
         map = {
             "name": "textContains",
@@ -288,15 +306,15 @@ class ElementActions:
 
         try:
             WebDriverWait(self.driver, wait).until(
-                lambda driver: driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value))
+                lambda driver: driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, ui_value))
 
             if is_Multiple == False:
-                return self.driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
+                return self.driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, ui_value)
             else:
-                return self.driver.find_elements(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
+                return self.driver.find_elements(AppiumBy.ANDROID_UIAUTOMATOR, ui_value)
         except:
             log.info('页面【{}】未找到 元素【{}】\n locator: {}'.format(locator_tmp.get("page"), locator_target.get('name'),
-                                                             str(locator_target)))
+                                                                    str(locator_target)))
             if is_Multiple == False:
                 return None
             else:
@@ -318,6 +336,15 @@ class ElementActions:
             return self._find_element(locator, is_raise=False, wait=wait)
         else:
             return self._find_elements(locator, is_raise=False, wait=wait)
+
+    def find_element_ByImage(self, imageName):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(current_dir, "../tests/test_zlj/"+imageName+".png")
+        with open(image_path, 'rb') as png_file:
+            b64_data = base64.b64encode(png_file.read()).decode('UTF-8')
+        workelement = self._find_element(locator=dict(name="elename", type=AppiumBy.IMAGE, value=b64_data),
+                                         is_need_displayed=True)
+        return workelement
 
     def is_element_exist(self, locator, wait=2):
         """检查元素是否存在"""
@@ -344,7 +371,6 @@ class ElementActions:
         self.click_ele(element, count, is_log=False)
 
         return self
-
 
     def click_ele(self, element, count=1, is_log=True):
         # 对元素对象进行点击
@@ -510,22 +536,23 @@ class ElementActions:
                 type_parent, value_parent, value_child)
 
             WebDriverWait(self.driver, wait).until(
-                lambda driver: driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value))
+                lambda driver: driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, ui_value))
 
-            log.info("页面【{}】的元素【{}】成功查找子节点 元素【{}】".format(locator_parent.get("page"), locator_parent.get("name"),
-                                                          locator_child.get('name')))
+            log.info("页面【{}】的元素【{}】成功查找子节点 元素【{}】".format(locator_parent.get("page"),
+                                                                        locator_parent.get("name"),
+                                                                        locator_child.get('name')))
 
             if is_Multiple == False:
-                return self.driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
+                return self.driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, ui_value)
             else:
-                return self.driver.find_elements(AppiumBy.ANDROID_UIAUTOMATOR,ui_value)
+                return self.driver.find_elements(AppiumBy.ANDROID_UIAUTOMATOR, ui_value)
 
 
         except:
             log.info(
                 "页面【{}】的元素【{}】未能查询到查找子节点 元素【{}】\n locator_parent:{} \n locator_child{}"
-                    .format(locator_parent.get("page"), locator_parent.get("name"),
-                            locator_child.get('name'), locator_parent, locator_child))
+                .format(locator_parent.get("page"), locator_parent.get("name"),
+                        locator_child.get('name'), locator_parent, locator_child))
 
             if is_Multiple == False:
                 return None
@@ -561,7 +588,8 @@ class ElementActions:
 
         """
 
-        waittime_count = Waittime_count(msg='[查找] 页面【{}】该元素【{}】等待时间:'.format(locator.get("page"), locator.get("name")))
+        waittime_count = Waittime_count(
+            msg='[查找] 页面【{}】该元素【{}】等待时间:'.format(locator.get("page"), locator.get("name")))
         waittime_count.start()
         try:
             if is_need_displayed:
@@ -577,7 +605,8 @@ class ElementActions:
 
             if is_raise == True:
                 log.error(
-                    "【{}】页面中未能找到元素【{}】\n locator: \n {}".format(locator.get("page"), locator.get("name"), locator))
+                    "【{}】页面中未能找到元素【{}】\n locator: \n {}".format(locator.get("page"), locator.get("name"),
+                                                                         locator))
                 raise NotFoundElementError
             else:
                 return None
@@ -600,7 +629,8 @@ class ElementActions:
 
             if is_raise == True:
                 log.error(
-                    "【{}】页面中未能找到元素【{}】\n locator: \n {}".format(locator.get("page"), locator.get("name"), locator))
+                    "【{}】页面中未能找到元素【{}】\n locator: \n {}".format(locator.get("page"), locator.get("name"),
+                                                                         locator))
                 raise NotFoundElementError
             else:
                 return []
@@ -625,7 +655,8 @@ class ElementActions:
         # find_element在安卓中appium定位不支持通过name查找,但uiautomator可以且速度快
         if ltype == 'name':
             ui_value = 'new UiSelector().textContains(\"{}\")'.format(value)
-            return driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,ui_value) if element else driver.find_elements("-android uiautomator",ui_value)
+            return driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, ui_value) if element else driver.find_elements(
+                "-android uiautomator", ui_value)
         else:
             return driver.find_element(ltype, value) if element else driver.find_elements(ltype, value)
 
@@ -637,9 +668,124 @@ class ElementActions:
             arg: event_list key
             num: KEYCODE_NUM 时用到对应数字
 
+
         """
         event_list = {'KEYCODE_HOME': 3, 'KEYCODE_BACK': 4, 'KEYCODE_MENU': 82, 'KEYCODE_NUM': 8}
         if arg == 'KEYCODE_NUM':
             self.driver.press_keycode(8 + int(num))
         elif arg in event_list:
             self.driver.press_keycode(int(event_list[arg]))
+    def get_image_path(self,image_name):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        reference_image_path = os.path.join(current_dir, "../data/referenceShot/"+image_name)
+        return reference_image_path
+    def get_image_front(self,image_name):
+        # 本地文件路径
+        image_path = self.get_image_path(image_name)
+        # 文件MIME类型（根据文件实际类型选择）
+        file_mime_type = 'image/png'  # 如果文件是PNG；如果是其他类型，则替换为相应的MIME类型
+        # 设置API URL和API密钥
+        api_key = 'app-xHRHJY3pStf6X88GPCscNqyC'
+        url = 'https://dify-test.91jzx.cn/v1/files/upload'
+        # 设置请求头
+        headers = {
+            'Authorization': f'Bearer {api_key}'
+        }
+        # 构建表单数据
+        data = {
+            'user': "admin"
+        }
+        # 准备表单数据
+        files = {
+            'file': (image_path, open(image_path, 'rb'), file_mime_type)
+        }
+        # 发送POST请求
+        response = requests.post(url, headers=headers, data=data, files=files, verify=False)
+        upload_file_id = response.json().get('id')
+        api_url = 'https://dify-test.91jzx.cn/v1/completion-messages'
+        # 设置请求头
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        }
+        # 准备表单数据
+        data = {
+            "inputs": {"query": "家庭作业"},
+            "response_mode": "blocking",
+            "user": "admin",
+            "files": [
+                {
+                    "type": "image",
+                    "url": "",
+                    "upload_file_id": f"{upload_file_id}",
+                    "transfer_method": "local_file"
+                }
+            ]
+        }
+        log.info(data)
+        # 发送POST请求
+        response = requests.post(api_url, headers=headers, json=data, verify=False)
+        # 解析 JSON 数据
+        response_dict = response.json()
+        # 提取 answer 字段
+        answer = response_dict.get('answer', '')
+        return answer
+    def assert_by_image(self, current_image_name,reference_image_name):
+        data_dir = Path(__file__).resolve().parent.parent / 'data'
+        reference_image_path = data_dir /"referenceShot"/ reference_image_name
+        current_image_path = data_dir  /'screenShot'/ current_image_name
+        b64_data = self._read_image_to_base64(current_image_path)
+        reference_text = self._extract_text_from_image(reference_image_path)
+        current_text = self._extract_text_from_image(current_image_path)
+
+        reference_hash = self._compute_image_hash(reference_image_path)
+        current_hash= self._compute_image_hash(current_image_path)
+        result1 = False
+        result2 = False
+        if current_text is not None and reference_text is not None:
+            if (current_text != reference_text):
+                print("Image has changed.")
+                result1=False
+        if current_hash is not None and reference_hash is not None:
+            if (current_hash!= reference_hash):
+                print("Image has changed.")
+                result2=False
+        try:
+            work = self._find_element(locator=dict(name="elename", type=AppiumBy.IMAGE, value=b64_data),is_need_displayed=True).is_displayed()
+        except Exception as e:
+            return False
+        return result1 & result2
+    def _read_image_to_base64(self,file_path):
+        try:
+            with open(file_path, 'rb') as png_file:
+                return base64.b64encode(png_file.read()).decode('UTF-8')
+        except FileNotFoundError:
+            print(f"Error: File {file_path} not found.")
+            return None
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        return None
+
+    def _extract_text_from_image(self,file_path):
+        try:
+            with Image.open(file_path) as img:
+                text = pytesseract.image_to_string(img, lang='chi_sim')
+                return text.strip()
+        except FileNotFoundError:
+            print(f"Error: File {file_path} not found.")
+            return None
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    def _compute_image_hash(self,file_path):
+        try:
+            with Image.open(file_path) as img:
+                return imagehash.average_hash(img)
+        except FileNotFoundError:
+            print(f"Error: File {file_path} not found.")
+            return None
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+
