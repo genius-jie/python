@@ -134,6 +134,7 @@ class LoginPage(BasePage):
 
 
     def load_android(self):
+        self.appPackage="com.jm.android.jumei"
         self.activity="com.jumei.login.loginbiz.activities.login.LoginActivity"
 
         self.密码登录tag=self.get_locator("密码登录tag",'id','com.jm.android.jumei:id/tab_login_account')

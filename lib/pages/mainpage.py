@@ -10,9 +10,11 @@ class mainPage(BasePage):
     name="桌面"
 
     def pageinto(self,action:ElementActions):
-        action.start_activity(self.activity)
+        action.start_activity(self.错题本activity)
 
     def load_android(self):
+        self.appPackage="com.jzx.client.launcher"
+        self.错题本activity="/.ui.MainActivity"
         self.姓名=self.get_locator("姓名",'name','姓名')
         self.年级=self.get_locator("年级",'name','年级')
         self.错题本=self.get_locator("错题本",'id','com.jzx.client.launcher:id/tv_error_note')

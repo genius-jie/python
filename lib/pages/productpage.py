@@ -24,6 +24,7 @@ class HomePage(BasePage):
         action.start_activity(self.activity)
 
     def load_android(self):
+        self.appPackage="com.jm.android.jumei"
         self.activity="/.home.activity.NewHomeActivity"
 
         self.关闭初始化浮窗=self.get_locator('关闭初始化浮窗','tap','891,132')

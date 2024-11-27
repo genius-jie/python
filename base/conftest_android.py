@@ -6,7 +6,7 @@ from base.action import ElementActions
 from base.environment import EnvironmentAndroid
 from base.utils import log
 from appium.options.android import UiAutomator2Options
-
+import urllib3
 
 
 # pytest的setup和down工作
@@ -58,6 +58,9 @@ def driverenv():
     #     # 进行其他操作...
     # except Exception as e:
     #     print(f"An error occurred: {e}")
+
+    # 禁用警告，免得每次执行后打印结果都有警告
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     driver = webdriver.Remote(f'http://127.0.0.1:4723', options=options)
     # driver = webdriver.Remote(host,  options=options)

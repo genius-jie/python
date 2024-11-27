@@ -58,20 +58,27 @@ class ElementActions:
         current_dir = os.path.dirname(os.path.abspath(__file__))
         screenshot_dir = os.path.join(current_dir, "../data/screenShot")
         screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
+        # 检查历史截图是否存在，如果存在则删除
+        # if os.path.exists(screenshot_path):
+        #     os.remove(screenshot_path)
+        #     print(f"已删除旧截图: {screenshot_path}")
         try:
             png_data = self.driver.get_screenshot_as_png()
             with open(screenshot_path, 'wb') as f:
                 f.write(png_data)
+            f.close()
+            print(f"截图已保存到: {screenshot_path}")
             return screenshot_path
         except Exception as e:
             print(f"Error taking screenshot: {e}")
         return None
 
-    def start_activity(self, app_activity, **opts):
+    def start_activity(self,appPackage, app_activity, **opts):
         message = 'start_activity:    ' + app_activity
         params = {
             # zlj:com.jm.android.jumei/.home.activity.NewHomeActivity
-            'intent': self.env.appium.get("appPackage") + app_activity,
+            # 'intent': self.env.appium.get("appPackage") + app_activity,
+            'intent': appPackage+ app_activity,
             **opts
         }
         # log.info(f"Params: {params}")
@@ -88,6 +95,10 @@ class ElementActions:
         # self.driver.start_activity(self.env.appium.get("appPackage"), app_activity, **opts)
         # self.driver.execute_script('mobile: startActivity', params)
         # self.driver.wait_activity(app_activity, 10, interval=0.3)
+        return self
+
+    def wait_for_activity(self,activity,timeout=1):
+        self.driver.wait_activity(activity, timeout, interval=0.3)
         return self
 
     def sleep(self, s, islog=True):
@@ -677,9 +688,9 @@ class ElementActions:
             self.driver.press_keycode(int(event_list[arg]))
     def get_image_path(self,image_name):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        reference_image_path = os.path.join(current_dir, "../data/referenceShot/"+image_name)
+        reference_image_path = os.path.join(current_dir, "../data/screenShot/"+image_name)
         return reference_image_path
-    def get_image_front(self,image_name):
+    def get_dify_imagetask(self,image_name,task):
         # 本地文件路径
         image_path = self.get_image_path(image_name)
         # 文件MIME类型（根据文件实际类型选择）
@@ -710,7 +721,7 @@ class ElementActions:
         }
         # 准备表单数据
         data = {
-            "inputs": {"query": "家庭作业"},
+            "inputs": {"input": task},
             "response_mode": "blocking",
             "user": "admin",
             "files": [
@@ -724,24 +735,20 @@ class ElementActions:
         }
         log.info(data)
         # 发送POST请求
-        response = requests.post(api_url, headers=headers, json=data, verify=False)
-        # 解析 JSON 数据
-        response_dict = response.json()
-        # 提取 answer 字段
-        answer = response_dict.get('answer', '')
-        return answer
+        response_json = requests.post(api_url, headers=headers, json=data, verify=False).json()
+        return response_json.get('answer')
     def assert_by_image(self, current_image_name,reference_image_name):
         data_dir = Path(__file__).resolve().parent.parent / 'data'
-        reference_image_path = data_dir /"referenceShot"/ reference_image_name
         current_image_path = data_dir  /'screenShot'/ current_image_name
-        b64_data = self._read_image_to_base64(current_image_path)
+        reference_image_path = data_dir /"referenceShot"/ reference_image_name
+        b64_data = self._read_image_to_base64(reference_image_path)
         reference_text = self._extract_text_from_image(reference_image_path)
         current_text = self._extract_text_from_image(current_image_path)
 
         reference_hash = self._compute_image_hash(reference_image_path)
         current_hash= self._compute_image_hash(current_image_path)
-        result1 = False
-        result2 = False
+        result1 = True
+        result2 = True
         if current_text is not None and reference_text is not None:
             if (current_text != reference_text):
                 print("Image has changed.")
@@ -751,9 +758,11 @@ class ElementActions:
                 print("Image has changed.")
                 result2=False
         try:
-            work = self._find_element(locator=dict(name="elename", type=AppiumBy.IMAGE, value=b64_data),is_need_displayed=True).is_displayed()
+            self._find_element(locator=dict(name="elename", type=AppiumBy.IMAGE, value=b64_data),is_need_displayed=True).is_displayed()
         except Exception as e:
             return False
+        if(result1 & result2):
+            log.info("Image has not changed.")
         return result1 & result2
     def _read_image_to_base64(self,file_path):
         try:
@@ -770,7 +779,7 @@ class ElementActions:
         try:
             with Image.open(file_path) as img:
                 text = pytesseract.image_to_string(img, lang='chi_sim')
-                return text.strip()
+                return text.strip().replace("\n", " ").replace(" ", "")
         except FileNotFoundError:
             print(f"Error: File {file_path} not found.")
             return None

@@ -1,8 +1,11 @@
+from .UserInfoPage import UserInfoPage
+from .homeworkpage import HomeWorkPage
 from .productpage import *
 from .userpage import *
 from .buypage import *
 from .vedio import *
 from .mainpage import *
+from .errornotepage import *
 from base.utils import Conf
 
 
@@ -34,6 +37,11 @@ class VedioPages:
 
 class MainPages:
     桌面=mainPage()
+
+class 精准学:
+    错题本=ErrorNotePage()
+    家庭作业辅导=HomeWorkPage()
+    用户信息=UserInfoPage()
 
 
 
