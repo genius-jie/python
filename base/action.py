@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import os
-
+from selenium.webdriver.support import expected_conditions as EC
 import imagehash
 import requests
 from appium import webdriver
@@ -21,6 +21,7 @@ from base.environment import EnvironmentAndroid
 from PIL import Image
 from pathlib import Path
 
+
 # 封装元素操作的类
 
 
@@ -37,6 +38,7 @@ class ElementActions:
 
         self.width = self.Resolution[0]
         self.height = self.Resolution[1]
+        log.info(self.width)
 
     def reset(self, driver: webdriver.Remote):
         """因为是单例,所以当driver变动的时候,需要重置一下driver
@@ -73,12 +75,12 @@ class ElementActions:
             print(f"Error taking screenshot: {e}")
         return None
 
-    def start_activity(self,appPackage, app_activity, **opts):
+    def start_activity(self, appPackage, app_activity, **opts):
         message = 'start_activity:    ' + app_activity
         params = {
             # zlj:com.jm.android.jumei/.home.activity.NewHomeActivity
             # 'intent': self.env.appium.get("appPackage") + app_activity,
-            'intent': appPackage+ app_activity,
+            'intent': appPackage + app_activity,
             **opts
         }
         # log.info(f"Params: {params}")
@@ -97,7 +99,7 @@ class ElementActions:
         # self.driver.wait_activity(app_activity, 10, interval=0.3)
         return self
 
-    def wait_for_activity(self,activity,timeout=1):
+    def wait_for_activity(self, activity, timeout=1):
         self.driver.wait_activity(activity, timeout, interval=0.3)
         return self
 
@@ -110,6 +112,10 @@ class ElementActions:
 
     def back_press(self):
         self._send_key_event('KEYCODE_BACK')
+
+
+    def home_press(self):
+        self.driver.background_app(1)
 
     def tap(self, locator):
         # 获取当前屏幕的分辨率，元素通过相对位置点击
@@ -163,58 +169,111 @@ class ElementActions:
 
         log.info("[长按] 页面【{}】的元素【{}】".format(locator.get('page'), locator.get('name')))
 
-    def swip_left(self, count=1):
+    def swip_left(self, parent_locator, count=1):
         """向左滑动,一般用于ViewPager
 
         Args:
             count: 滑动次数
 
         """
-
+        ele = self.find_ele(parent_locator)
+        ele_location = ele.location
+        ele_size = ele.size
         for x in range(count):
-            self.driver.swipe(self.width * 9 / 10, self.height / 2, self.width / 10, self.height / 2, 1000)
+            self.driver.swipe(ele_location['x'] + ele_size['width'] - 10, ele_location['y'] + ele_size['height'] / 2,
+                              ele_location['x'], ele_location['y'] + ele_size['height'] / 2, 1000)
         log.info("----------向左滑动----------")
         return self
 
-    def swip_right(self, count=1):
+    def swipe_and_find_element(self, direction, parent_locator, childs_locator, target_element_locator):
+        directions = []
+        if direction == "x":
+            directions = ["right", "left"]
+        elif direction == "y":
+            directions = ["down", "up"]
+        else:
+            log.error("参数direction错误，请输入x或y")
+            return None
+        for dirn in directions:
+            try:
+                target_element = self._swipe_and_find_element_(dirn, parent_locator, childs_locator,target_element_locator)
+                if target_element:
+                    return target_element
+            except Exception as e:
+                # 记录异常信息，但继续尝试其他方向
+                print(f"Error swiping {dirn}: {e}")
+        return None
+
+    def _swipe_and_find_element_(self, direction, parent_locator, childs_locator, target_element_locator):
+        all_elements = []
+        new_elements = self.find_ele(childs_locator, is_Multiple=True)
+        while new_elements and not self.is_element_exist(target_element_locator):
+            all_elements.extend(new_elements)
+            if direction == 'right':
+                self.swip_right(parent_locator)
+            elif direction == 'left':
+                self.swip_left(parent_locator)
+            elif direction == 'down':
+                self.swip_left(parent_locator)
+            elif direction == 'up':
+                self.swip_left(parent_locator)
+            else:
+                break
+            elements = self.find_ele(childs_locator, is_Multiple=True)
+            new_elements = [elem for elem in elements if elem not in all_elements]
+            log.info("滑动后剩余元素数量：{}".format(len(new_elements)))
+        if self.is_element_exist(target_element_locator):
+            return self.find_ele(target_element_locator)
+        return None
+
+    def swip_right(self, parent_locator, count=1):
         """
             向右滑
         """
-
+        ele = self.find_ele(parent_locator)
+        ele_location = ele.location
+        ele_size = ele.size
         for x in range(count):
-            self.driver.swipe(self.width / 10, self.height / 2, self.width * 9 / 10, self.height / 2, 1000)
+            self.driver.swipe(ele_location['x'], ele_location['y'] + ele_size['height'] / 2,
+                              ele_location['x'] + ele_size['width'] - 10, ele_location['y'] + ele_size['height'] / 2,
+                              100)
         log.info("----------向右滑动----------")
         return self
 
-    def swip_down(self, count=1, half=False):
+    def swip_down(self, parent_locator, count=1):
         """向下滑动,常用于下拉刷新
 
         Args:
             count: 滑动次数
             half:是否为滑动一半
         """
+        ele = self.find_ele(parent_locator)
+        ele_location = ele.location
+        ele_size = ele.size
         for x in range(count):
-            if half == False:
-                self.driver.swipe(self.width / 2, self.height * 9 / 10, self.width / 2, self.height * 1 / 10, 1000)
-            else:
-                self.driver.swipe(self.width / 2, self.height * 3 / 5, self.width / 2, self.height * 1 / 5, 1000)
+            self.driver.swipe(ele_location['x'] / 2, ele_location['y'], ele_location['x'] / 2,
+                              ele_location['y'] + ele_size['height'] - 10, 100)
         log.info("---------向下滑动----------")
         return self
 
-    def swip_up(self, count=1):
+    def swip_up(self, parent_locator, count=1):
         """向上滑动,常用于下拉刷新
 
         Args:
             count: 滑动次数
         """
 
+        ele = self.find_ele(parent_locator)
+        ele_location = ele.location
+        ele_size = ele.size
         for x in range(count):
-            self.driver.swipe(self.width / 2, self.height * 1 / 10, self.width / 2, self.height * 9 / 10, 1000)
+            self.driver.swipe(ele_location['x'] / 2, ele_location['y'] + ele_size['height'] - 10, ele_location['x'] / 2,
+                              ele_location['y'], 100)
 
         log.info("----------向上滑动---------")
         return self
 
-    def find_ele_child(self, locator_parent, locator_child, is_Multiple=False, wait=8):
+    def find_ele_child(self, locator_parent, locator_child, is_Multiple=False, wait=1):
         # 通过父结点定位方式查找子结点元素
         # 定位方式限制：如果子节点定位方式为name时，父节点定位方式只能为id、name、class name
 
@@ -232,7 +291,7 @@ class ElementActions:
         else:
             return self._find_ele_child_byname(locator_parent, locator_child, is_Multiple, wait)
 
-    def find_ele_child_byelement(self, element_parent, locator_child, is_Multiple=False, wait=6):
+    def find_ele_child_byelement(self, element_parent, locator_child, is_Multiple=False, wait=1):
         # 通过父结点元素查找子结点元素,不支持name定位方式，支持查找到很多个子节点
 
         if locator_child['type'] == 'name':
@@ -264,7 +323,7 @@ class ElementActions:
             else:
                 return []
 
-    def find_ele_parent(self, locator_parent, locator_child, wait=2):
+    def find_ele_parent(self, locator_parent, locator_child, wait=1):
         # 通过子节点来定位父节点元素,locator_parent有多个元素（通过遍历父节点，找出包含符合条件子节点的父节点）
         # 注意，子节点必须唯一，不然找到的父节点可能只是第一个匹配上的
         # 定位方式限制 子节点 定位方式不能是name
@@ -286,7 +345,7 @@ class ElementActions:
 
         return None
 
-    def find_ele_fromparent(self, locator_tmp, locator_target, is_Multiple=False, wait=5):
+    def find_ele_fromparent(self, locator_tmp, locator_target, is_Multiple=False, wait=1):
         # 通过uiautomator查找定位元素的兄弟节点元素,不支持xpath，且兄弟节点必须同级
         """
         支持的定位方式有：text(name),description(特有的),id,class name
@@ -331,7 +390,7 @@ class ElementActions:
             else:
                 return []
 
-    def find_ele(self, locator, is_Multiple=False, wait=5):
+    def find_ele(self, locator, is_Multiple=False, wait=1):
         # 通过定位器查找元素,不用于断言（断言元素存在用 is_element_exist ，断言页面是否含有对应文本关键字的请用is_text_displayed）
         # 需要查找多个时，返回list
         # 没有查找到时，返回None 或 []
@@ -350,14 +409,14 @@ class ElementActions:
 
     def find_element_ByImage(self, imageName):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, "../tests/test_zlj/"+imageName+".png")
+        image_path = os.path.join(current_dir, "../tests/test_zlj/" + imageName + ".png")
         with open(image_path, 'rb') as png_file:
             b64_data = base64.b64encode(png_file.read()).decode('UTF-8')
         workelement = self._find_element(locator=dict(name="elename", type=AppiumBy.IMAGE, value=b64_data),
                                          is_need_displayed=True)
         return workelement
 
-    def is_element_exist(self, locator, wait=2):
+    def is_element_exist(self, locator, wait=1):
         """检查元素是否存在"""
 
         if self._find_element(locator, is_raise=False, wait=wait) == None:
@@ -367,7 +426,7 @@ class ElementActions:
             log.info("已查找到  页面【{}】的元素【{}】".format(locator.get("page"), locator.get("name")))
             return True
 
-    def click(self, locator, count=1, wait=5):
+    def click(self, locator, count=1, wait=2):
         """基础的点击事件
 
         Args:
@@ -452,16 +511,13 @@ class ElementActions:
             element.clear()
         element.send_keys(value)
 
-    def is_toast_show(self, message, wait=5):
+    def is_toast_show(self, message, wait=1):
         """Android检查是否有对应Toast显示,常用于断言
-
         Args:
             message: Toast信息
             wait:  等待时间
-
         Returns:
             True 显示Toast
-
         """
 
         toast_loc = ("xpath", ".//*[contains(@text,'%s')]" % message)
@@ -508,8 +564,10 @@ class ElementActions:
                 raise NotFoundTextError
             else:
                 return False
+    def is_clickable(self, locator):
+        EC.element_to_be_clickable(locator)
 
-    def dialog_ok(self, wait=5):
+    def dialog_ok(self, wait=1):
         locator = {'name': '对话框确认键', 'type': 'id', 'value': 'android:id/button1'}
         self.click(locator)
 
@@ -525,7 +583,7 @@ class ElementActions:
 
     # ======================= private ====================
 
-    def _find_ele_child_byname(self, locator_parent, locator_child, is_Multiple=False, wait=8):
+    def _find_ele_child_byname(self, locator_parent, locator_child, is_Multiple=False, wait=1):
         # 使用uiautomator通过父节点，定位子节点。
 
         value_parent, type_parent = locator_parent['value'], locator_parent['type']
@@ -552,13 +610,10 @@ class ElementActions:
             log.info("页面【{}】的元素【{}】成功查找子节点 元素【{}】".format(locator_parent.get("page"),
                                                                         locator_parent.get("name"),
                                                                         locator_child.get('name')))
-
             if is_Multiple == False:
                 return self.driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, ui_value)
             else:
                 return self.driver.find_elements(AppiumBy.ANDROID_UIAUTOMATOR, ui_value)
-
-
         except:
             log.info(
                 "页面【{}】的元素【{}】未能查询到查找子节点 元素【{}】\n locator_parent:{} \n locator_child{}"
@@ -584,7 +639,7 @@ class ElementActions:
 
         return text in self.driver.page_source
 
-    def _find_element(self, locator, is_need_displayed=True, wait=5, is_raise=True):
+    def _find_element(self, locator, is_need_displayed=True, wait=1, is_raise=True):
         """查找单个元素,如果有多个返回第一个
 
         Args:
@@ -622,7 +677,7 @@ class ElementActions:
             else:
                 return None
 
-    def _find_elements(self, locator, wait=6, is_raise=False):
+    def _find_elements(self, locator, wait=1, is_raise=False):
         """查找元素,可查找出多个
 
         Args:
@@ -686,11 +741,13 @@ class ElementActions:
             self.driver.press_keycode(8 + int(num))
         elif arg in event_list:
             self.driver.press_keycode(int(event_list[arg]))
-    def get_image_path(self,image_name):
+
+    def get_image_path(self, image_name):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        reference_image_path = os.path.join(current_dir, "../data/screenShot/"+image_name)
+        reference_image_path = os.path.join(current_dir, "../data/screenShot/" + image_name)
         return reference_image_path
-    def get_dify_imagetask(self,image_name,task):
+
+    def get_dify_imagetask(self, image_name, task):
         # 本地文件路径
         image_path = self.get_image_path(image_name)
         # 文件MIME类型（根据文件实际类型选择）
@@ -737,34 +794,37 @@ class ElementActions:
         # 发送POST请求
         response_json = requests.post(api_url, headers=headers, json=data, verify=False).json()
         return response_json.get('answer')
-    def assert_by_image(self, current_image_name,reference_image_name):
+
+    def assert_by_image(self, current_image_name, reference_image_name):
         data_dir = Path(__file__).resolve().parent.parent / 'data'
-        current_image_path = data_dir  /'screenShot'/ current_image_name
-        reference_image_path = data_dir /"referenceShot"/ reference_image_name
+        current_image_path = data_dir / 'screenShot' / current_image_name
+        reference_image_path = data_dir / "referenceShot" / reference_image_name
         b64_data = self._read_image_to_base64(reference_image_path)
         reference_text = self._extract_text_from_image(reference_image_path)
         current_text = self._extract_text_from_image(current_image_path)
 
         reference_hash = self._compute_image_hash(reference_image_path)
-        current_hash= self._compute_image_hash(current_image_path)
+        current_hash = self._compute_image_hash(current_image_path)
         result1 = True
         result2 = True
         if current_text is not None and reference_text is not None:
             if (current_text != reference_text):
                 print("Image has changed.")
-                result1=False
+                result1 = False
         if current_hash is not None and reference_hash is not None:
-            if (current_hash!= reference_hash):
+            if (current_hash != reference_hash):
                 print("Image has changed.")
-                result2=False
+                result2 = False
         try:
-            self._find_element(locator=dict(name="elename", type=AppiumBy.IMAGE, value=b64_data),is_need_displayed=True).is_displayed()
+            self._find_element(locator=dict(name="elename", type=AppiumBy.IMAGE, value=b64_data),
+                               is_need_displayed=True).is_displayed()
         except Exception as e:
             return False
-        if(result1 & result2):
+        if (result1 & result2):
             log.info("Image has not changed.")
         return result1 & result2
-    def _read_image_to_base64(self,file_path):
+
+    def _read_image_to_base64(self, file_path):
         try:
             with open(file_path, 'rb') as png_file:
                 return base64.b64encode(png_file.read()).decode('UTF-8')
@@ -775,7 +835,7 @@ class ElementActions:
             print(f"An error occurred: {e}")
         return None
 
-    def _extract_text_from_image(self,file_path):
+    def _extract_text_from_image(self, file_path):
         try:
             with Image.open(file_path) as img:
                 text = pytesseract.image_to_string(img, lang='chi_sim')
@@ -787,7 +847,7 @@ class ElementActions:
             print(f"An error occurred: {e}")
             return None
 
-    def _compute_image_hash(self,file_path):
+    def _compute_image_hash(self, file_path):
         try:
             with Image.open(file_path) as img:
                 return imagehash.average_hash(img)
@@ -797,4 +857,3 @@ class ElementActions:
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
-

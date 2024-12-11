@@ -65,7 +65,7 @@ def driverenv():
     driver = webdriver.Remote(f'http://127.0.0.1:4723', options=options)
     # driver = webdriver.Remote(host,  options=options)
     driver.update_settings({"fixImageTemplatescale": True})
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(1)
     return driver
 
 
@@ -84,4 +84,5 @@ def caserun(action):
     log.info("————————————————————————执行用例 ----------——————————————")
     yield
     action.sleep(1).get_img("用例结束前的截图")
+    action.back_press()
     log.info("————————————————————————该用例执行结束 ----------——————————————")

@@ -15,6 +15,7 @@ devices:
   platformVersion: '13'
   appiumserver: http://127.0.0.1:4723/wd/hub
   systemPort: 8201
+  Resolution: [2880,1800]
 
 # device1:
 #  deviceName: 9109ad84

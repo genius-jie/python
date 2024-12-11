@@ -1,0 +1,31 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1732093460745,801,测试环境登录排课系统,200,,线程组 1-1,text,true,,11953,241,1,1,https://inc-test.91jzx.cn/inc/user/login?userMobile=18868730662&password=123456,797,0,531
+1732093461567,372,排课设置体验还是正式，哪一行,500,javax.script.ScriptException: javax.script.ScriptException: java.io.FileNotFoundException: .\courseId2.txt (系统找不到指定的文件。),线程组 1-1,text,false,,0,0,1,1,null,0,0,0
+1732093461940,1528,查看排课计划,200,,线程组 1-1,text,true,,146006,285,1,1,https://inc-test.91jzx.cn/edu/student/manage/queryStudentCourseTimes?userId=1821425660820688897,1456,0,0
+1732093463486,99,立即结束排课计划,200,,线程组 1-1,text,true,,375,311,1,1,https://inc-test.91jzx.cn/edu/classPlan/updateClassPlanStatus?lessonPlanId=1859158995815604225&userId=1821425660820688897,99,0,0
+1732093463585,68,排课-${courseName},200,,线程组 1-1,text,false,Test failed: text expected to contain /成功/,403,537,1,1,https://inc-test.91jzx.cn/edu/student/manage/planStudentCourseTimes,67,0,0
+1732094076195,1433,测试环境登录排课系统,200,,线程组 1-1,text,true,,11953,351,1,1,https://inc-test.91jzx.cn/inc/user/login?userMobile=18868730662&password=123456,1428,0,1162
+1732094077651,363,排课设置体验还是正式，哪一行,500,javax.script.ScriptException: javax.script.ScriptException: java.io.FileNotFoundException: .\courseId.txt (系统找不到指定的文件。),线程组 1-1,text,false,,0,0,1,1,null,0,0,0
+1732094078015,1534,查看排课计划,200,,线程组 1-1,text,true,,153725,395,1,1,https://inc-test.91jzx.cn/edu/student/manage/queryStudentCourseTimes?userId=1821425660820688897,1490,0,0
+1732094079572,98,立即结束排课计划,200,,线程组 1-1,text,true,,375,421,1,1,https://inc-test.91jzx.cn/edu/classPlan/updateClassPlanStatus?lessonPlanId=1859163319958478850&userId=1821425660820688897,98,0,0
+1732094079670,123,排课-${courseName},200,,线程组 1-1,text,false,Test failed: text expected to contain /成功/,403,606,1,1,https://inc-test.91jzx.cn/edu/student/manage/planStudentCourseTimes,123,0,0
+1732094101113,757,测试环境登录排课系统,200,,线程组 1-1,text,true,,11953,351,1,1,https://inc-test.91jzx.cn/inc/user/login?userMobile=18868730662&password=123456,754,0,501
+1732094101893,364,排课设置体验还是正式，哪一行,500,javax.script.ScriptException: javax.script.ScriptException: java.io.FileNotFoundException: .\courseId.txt (系统找不到指定的文件。),线程组 1-1,text,false,,0,0,1,1,null,0,0,0
+1732094102258,2004,查看排课计划,200,,线程组 1-1,text,true,,154898,395,1,1,https://inc-test.91jzx.cn/edu/student/manage/queryStudentCourseTimes?userId=1821425660820688897,1583,0,0
+1732094104283,128,立即结束排课计划,200,,线程组 1-1,text,true,,375,421,1,1,https://inc-test.91jzx.cn/edu/classPlan/updateClassPlanStatus?lessonPlanId=1859163465941229570&userId=1821425660820688897,128,0,0
+1732094104412,155,排课-${courseName},200,,线程组 1-1,text,false,Test failed: text expected to contain /成功/,403,606,1,1,https://inc-test.91jzx.cn/edu/student/manage/planStudentCourseTimes,155,0,0
+1732094782546,870,测试环境登录排课系统,200,,线程组 1-1,text,true,,11954,351,1,1,https://inc-test.91jzx.cn/inc/user/login?userMobile=18868730662&password=123456,867,0,607
+1732094783439,385,排课设置体验还是正式，哪一行,200,OK,线程组 1-1,text,true,,0,0,1,1,null,0,0,0
+1732094783825,1557,查看排课计划,200,,线程组 1-1,text,true,,157096,395,1,1,https://inc-test.91jzx.cn/edu/student/manage/queryStudentCourseTimes?userId=1821425660820688897,1506,0,0
+1732094785400,110,立即结束排课计划,200,,线程组 1-1,text,true,,375,421,1,1,https://inc-test.91jzx.cn/edu/classPlan/updateClassPlanStatus?lessonPlanId=1859165807981862914&userId=1821425660820688897,109,0,0
+1732094785511,251,排课-2024四年级秋季体验营——brief测试,200,,线程组 1-1,text,true,,375,618,1,1,https://inc-test.91jzx.cn/edu/student/manage/planStudentCourseTimes,251,0,0
+1732094813970,807,测试环境登录排课系统,200,,线程组 1-1,text,true,,11960,351,1,1,https://inc-test.91jzx.cn/inc/user/login?userMobile=18868730662&password=123456,803,0,517
+1732094814801,400,排课设置体验还是正式，哪一行,200,OK,线程组 1-1,text,true,,0,0,1,1,null,0,0,0
+1732094815202,1534,查看排课计划,200,,线程组 1-1,text,true,,159314,395,1,1,https://inc-test.91jzx.cn/edu/student/manage/queryStudentCourseTimes?userId=1821425660820688897,1490,0,0
+1732094816752,100,立即结束排课计划,200,,线程组 1-1,text,true,,375,421,1,1,https://inc-test.91jzx.cn/edu/classPlan/updateClassPlanStatus?lessonPlanId=1859166465363517441&userId=1821425660820688897,100,0,0
+1732094816853,235,排课-2024四年级秋季体验营——brief测试,200,,线程组 1-1,text,true,,375,618,1,1,https://inc-test.91jzx.cn/edu/student/manage/planStudentCourseTimes,235,0,0
+1732096448515,1371,测试环境登录排课系统,200,,线程组 1-1,text,true,,11953,351,1,1,https://inc-test.91jzx.cn/inc/user/login?userMobile=18868730662&password=123456,1367,0,1121
+1732096449911,434,排课设置体验还是正式，哪一行,200,OK,线程组 1-1,text,true,,0,0,1,1,null,0,0,0
+1732096450346,1523,查看排课计划,200,,线程组 1-1,text,true,,160387,395,1,1,https://inc-test.91jzx.cn/edu/student/manage/queryStudentCourseTimes?userId=1821425660820688897,1455,0,0
+1732096451887,101,立即结束排课计划,200,,线程组 1-1,text,true,,375,421,1,1,https://inc-test.91jzx.cn/edu/classPlan/updateClassPlanStatus?lessonPlanId=1859166528722673666&userId=1821425660820688897,101,0,0
+1732096451988,239,排课-2024四年级秋季体验营——brief测试,200,,线程组 1-1,text,true,,375,618,1,1,https://inc-test.91jzx.cn/edu/student/manage/planStudentCourseTimes,239,0,0
