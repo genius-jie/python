@@ -25,8 +25,8 @@ devices:
 #  systemPort: 8201
 
 path:
- tests: C:\Users\ali\Documents\py_appauto\tests
- report: C:\Users\ali\Documents\py_appauto\report
+ tests: tests
+ report: report
 
 
 

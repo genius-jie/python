@@ -93,14 +93,14 @@ class ElementActions:
             raise
 
         # 等待指定的活动启动
-        self.driver.wait_activity(app_activity, 10, interval=0.3)
+        self.driver.wait_activity(app_activity, 2, interval=1)
         # self.driver.start_activity(self.env.appium.get("appPackage"), app_activity, **opts)
         # self.driver.execute_script('mobile: startActivity', params)
         # self.driver.wait_activity(app_activity, 10, interval=0.3)
         return self
 
     def wait_for_activity(self, activity, timeout=1):
-        self.driver.wait_activity(activity, timeout, interval=0.3)
+        self.driver.wait_activity(activity, timeout, interval=1)
         return self
 
     def sleep(self, s, islog=True):

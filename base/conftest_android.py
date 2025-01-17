@@ -2,6 +2,9 @@
 
 import pytest, os, logging
 from appium import webdriver
+from appium.webdriver.appium_connection import AppiumConnection
+from selenium.webdriver.remote.client_config import ClientConfig
+
 from base.action import ElementActions
 from base.environment import EnvironmentAndroid
 from base.utils import log
@@ -22,19 +25,19 @@ def driverenv():
         'platformName': current_device.get("platformName"),
         'platformVersion': current_device.get("platformVersion"),
         'deviceName': current_device.get("deviceName"),
-        'udid': current_device.get("deviceName"),
-        'systemPort': current_device.get('systemPort'),
+        # 'udid': current_device.get("deviceName"),
+        # 'systemPort': current_device.get('systemPort'),
         # 'app': env.appium.get("app"),
-        'clearSystemFiles': True,
+        # 'clearSystemFiles': True,
         # 'appActivity': env.appium.get("appActivity"),
         # 'appPackage': env.appium.get("appPackage"),
-        'automationName': 'UIAutomator2',
-        'noSign': True,
+        # 'automationName': 'UIAutomator2',
+        # 'noSign': True,
         # 'recreateChromeDriverSessions': True,
-        "unicodeKeyboard": True,
-        "noReset": True,
-        "fullReset": False,
-        "newCommandTimeout": 300
+        # "unicodeKeyboard": True,
+        # "noReset": True,
+        # "fullReset": False,
+        # "newCommandTimeout": 300
     }
     log.info(capabilities)
     # systemPort=current_device.get('systemPort')
@@ -43,7 +46,7 @@ def driverenv():
     #
     log.info('当前执行的appium相关配置为：' + str(capabilities))
 
-    host = current_device.get('appiumserver')
+    # host = current_device.get('appiumserver')
 
 
     # 创建Appium选项对象
@@ -51,6 +54,8 @@ def driverenv():
     # for key, value in capabilities.items():
     #     options.set_capability(key, value)
     options = UiAutomator2Options().load_capabilities(capabilities)
+
+
     # 初始化WebDriver
     #
     # try:
@@ -59,12 +64,18 @@ def driverenv():
     # except Exception as e:
     #     print(f"An error occurred: {e}")
 
-    # 禁用警告，免得每次执行后打印结果都有警告
+    # 使用 ClientConfig 初始化 AppiumConnection,解决remote_server_addr in RemoteConnection() is deprecated的报错，webdriver.Remote(f'http://127.0.0.1:4723', options=options)  这样会报错
+    client_config = ClientConfig(
+        remote_server_addr='http://127.0.0.1:4723',  # 注意 URL 路径部分
+        keep_alive=True,
+    )
+    command_executor = AppiumConnection(client_config=client_config)
+    # 禁用警告，免得每次执行后打印结果都有HTTPS警告
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-    driver = webdriver.Remote(f'http://127.0.0.1:4723', options=options)
+    driver = webdriver.Remote(command_executor=command_executor, options=options)
     # driver = webdriver.Remote(host,  options=options)
-    driver.update_settings({"fixImageTemplatescale": True})
+    # driver.update_settings({"fixImageTemplatescale": True})
     driver.implicitly_wait(1)
     return driver
 

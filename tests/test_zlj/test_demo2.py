@@ -32,22 +32,22 @@ class Test_demo():
         # 打开用户信息-张诺安
         jzx.用户信息.pageinto(action)
         action.click(jzx.用户信息.切换用户)
-        action.swipe_and_find_element( "x",jzx.用户信息.用户列表框,jzx.用户信息.用户列表数, jzx.用户信息.张诺安).click()
+        action.swipe_and_find_element( "x",jzx.用户信息.用户列表框,jzx.用户信息.用户列表数, jzx.用户信息.张近义).click()
         action.click(jzx.用户信息.点击切换)
-        action.click(jzx.用户信息.教材年级)
-        action.click(jzx.用户信息.年级)
-        action.click(jzx.用户信息.三年级)
-        eles=action.find_ele(jzx.用户信息.确定,is_Multiple=True)
-        print(len(eles))
-        # 遍历并点击每个链接
-        for ele in eles:
-            ele.click()
-        action.sleep(2)
-        action.click(jzx.用户信息.地区)
-        action.click(jzx.用户信息.地区安徽省)
-        action.click(jzx.用户信息.安徽安庆市)
-        action.click(jzx.用户信息.确定)
-        action.click(jzx.用户信息.确定)
+        # action.click(jzx.用户信息.教材年级)
+        # action.click(jzx.用户信息.年级)
+        # action.click(jzx.用户信息.三年级)
+        # eles=action.find_ele(jzx.用户信息.确定,is_Multiple=True)
+        # print(len(eles))
+        # # 遍历并点击每个链接
+        # for ele in eles:
+        #     ele.click()
+        # action.sleep(2)
+        # action.click(jzx.用户信息.地区)
+        # action.click(jzx.用户信息.地区安徽省)
+        # action.click(jzx.用户信息.安徽安庆市)
+        # action.click(jzx.用户信息.确定)
+        # action.click(jzx.用户信息.确定)
 
 
         # action.click(jzx.用户信息.张诺安)

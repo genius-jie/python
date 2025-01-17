@@ -1,3 +1,5 @@
+import subprocess
+
 from base.shell import Shell
 from base.utils import log,Conf,ls_by_key,Logbuilder
 from base.environment import EnvironmentAndroid
@@ -67,8 +69,12 @@ class Run():
         try:
             Shell.invoke(cmd)
             log.info("测试报告成功生成")
+            # 启动Allure服务器并打开报告
+            allure_cmd = f'allure open {self.html_report_path}'
+            # Shell.invoke(allure_cmd)
+            # subprocess.Popen(allure_cmd, shell=True)
         except:
-            log.error("Html测试报告生成失败,确保已经安装了Allure-Commandline")
+            log.error("Html测试报告已关闭")
 
 
 
